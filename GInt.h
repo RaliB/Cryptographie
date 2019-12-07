@@ -1,5 +1,7 @@
 
-#include <stdint-gcc.h>
+
+#include <cstdint>
+#include <string>
 
 class GInt {
 private:
@@ -13,11 +15,14 @@ public:
             p_uint[i] = 0;
         }
     }
+
+    GInt(std::string nombre);
     GInt(){
         taille = 0;
         p_uint = nullptr;
     }
     GInt(const GInt &copie);
+
 
     GInt & operator=(const GInt &copie);
 
@@ -26,8 +31,6 @@ public:
     GInt SoustraitUn();
 
     GInt Soustrait(const GInt &add);
-
-
 
     // Juste pour les test :
     void setp_int(uint32_t * p_int){
@@ -44,10 +47,20 @@ public:
         return taille;
     }
 
+    static GInt max(GInt &a,GInt &b){
+        return a.p_uint[a.taille-1]>b.p_uint[b.taille-1]?a:b;
+    }
 
     ~GInt(){
         delete [] p_uint;
     }
 
+
     GInt &Egal(GInt copie);
+
+    GInt Div10(); // Affiche reste retourne quotient
+
+    bool EstNul();
+    bool operator>(const GInt &copie);
+
 };

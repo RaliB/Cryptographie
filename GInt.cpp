@@ -2,6 +2,7 @@
 #include <math.h>
 #include <iostream>
 #include <algorithm>
+#include <bitset>
 
 
 GInt::GInt(std::string nombre){
@@ -116,7 +117,6 @@ GInt & GInt::operator=(const GInt &copie) {
 
 
 
-
 // On travail en modulo 2^32
 GInt GInt::Addition(const GInt &add){
     long long int s1,s2,c,addition; //long long int-->2^63-1
@@ -209,6 +209,92 @@ GInt GInt::SoustraitUn(){
 
     return Soustrait(add); // la c'est *this.Soustrait(add);
 }
+
+
+
+GInt GInt::Div10() {
+    long long int a;
+    uint32_t b = 0;
+    GInt q1(3);
+    GInt q2(3);
+    GInt q3(2);
+    GInt Quotient(taille);
+    long long int max = (long long int) (b-1); // r - 1
+    q3.p_uint[1] = 10; // Bt−1 * r
+
+    while(p_uint[taille-1] >= 10){// Tant que A > B * r ^(n-1)
+        Quotient.p_uint[taille-1] = Quotient.p_uint[taille-1] +1;
+        p_uint[taille-1] = p_uint[taille-1] - 10;
+    }
+    for(uint32_t i = taille-1;i>0;i--){
+        if(p_uint[i] == 10){
+            Quotient.p_uint[i-1] = max;
+        }
+        else{
+            Quotient.p_uint[i-1] = floor(((long long int)p_uint[i]*(max+1) + p_uint[i-1])/(10));
+        }
+        q2.p_uint[0] = i>2?p_uint[i-2]:0;
+        q2.p_uint[1] = p_uint[i-1];
+        q2.p_uint[2] = p_uint[i];
+        q1.p_uint[0] = Quotient.p_uint[i-1];
+        q1 = q1.Multiplication(q3);
+        while(q1>q2){
+            Quotient.p_uint[i-1] = Quotient.p_uint[i-1] -1;
+            q1.p_uint[0] = Quotient.p_uint[i-1];
+            q1 = q1.Multiplication(q3);
+        }
+        GInt q4(i-1);
+        q4.p_uint[i-2] = 1;
+        q1 = q1.Multiplication(q4);
+
+        (*this) = this->Soustrait(q1);
+
+    }
+    std::cout<<p_uint[0]<<std::endl;
+    (*this) = Quotient;
+    return (*this);
+
+}
+
+
+
+bool GInt::EstNul() {
+    bool nul = true;
+    for(uint32_t i =0;i < taille;i++){
+        if(p_uint[taille-i] != 0){
+            nul = false;
+            break;
+        }
+    }
+    return nul;
+}
+
+
+bool GInt::operator>(const GInt &copie) {
+    bool retour = false;
+
+    if(taille > copie.taille){
+        retour = true;
+    }
+    else if(taille < copie.taille){
+            retour = false;
+    }
+    else{
+        for(uint32_t i = taille-1;i>0;i--){
+            if(p_uint[i]>copie.p_uint[i]){
+                retour = true;
+                break;
+            }
+            else if(p_uint[i]<copie.p_uint[i]){
+                retour = false;
+                break;
+            }
+        }
+    }
+
+    return retour;
+}
+
 
 /*
 GInt GInt::Multiplication(GInt &add);
